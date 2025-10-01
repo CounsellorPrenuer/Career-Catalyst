@@ -1,0 +1,152 @@
+You are an expert full-stack web developer agent. Your task is to build a sophisticated, modern, and fully responsive portfolio website for Elroy Vaz, for his brand Career Catalyst.
+
+Primary Goal: Your design must be inspired by the polished UI/UX of the leadcrestconsulting.com example. The entire website—aesthetics, content, and structure—must be tailored to Elroy Vaz's brand, his dual target audience (individuals and businesses), and his specified color preferences. The final product must be professional, calming, and highly credible.
+
+1. Core Technical Stack & Setup
+Framework: React with Vite.
+
+Styling: Tailwind CSS.
+
+File Structure: Organize into src/components (for Navbar, Hero, ServiceCard, Footer, etc.) and src/assets for images.
+
+2. Design Language & Inspiration Analysis
+Adhere to the modern design principles of the leadcrestconsulting.com example, but adapt them to the client's preferences.
+
+Layout & Spacing: Use clean grids, ample whitespace, and clear visual separation between sections, especially between the "Individual" and "Business" offerings.
+
+Color Palette: The client requested "Nice soothing colours." Create a calm, professional, and trustworthy palette.
+
+Primary Base: Use a sophisticated, soft slate blue (e.g., #607D8B) or a deep cadet blue (e.g., #5F9EA0).
+
+Accent Color: Use a gentle, muted teal (e.g., #4DB6AC) or a warm sand color (e.g., #F4A460) for accents, buttons, and highlights.
+
+Background: Use a clean off-white or a very light gray (e.g., #F5F5F5) to create a serene backdrop.
+
+UI Elements: Implement Glassmorphism, soft shadows, and smooth hover effects (scaling, color transitions) on all interactive elements as seen in the example.
+
+Animations: Use subtle on-scroll fade-in and slide-in animations for a premium feel.
+
+3. Branding & Core Identity
+Brand Name: Career Catalyst
+
+Counselor's Name: Elroy Vaz
+
+Logo: No logo was provided. Create a clean, elegant, text-based logo. It should feature "Career Catalyst" prominently, with "By Elroy Vaz" as a smaller tagline below it.
+
+Profile Picture: Use the image from this Google Drive link: https://drive.google.com/open?id=18hPRVsCRMi0xHnEIbvRVj5tM_46QZS2O
+
+Typography: Use a professional and highly readable font pairing, such as "Lato" for headings and "Open Sans" for body text.
+
+4. Website Structure & Content (Dual-Audience Strategy)
+The website structure must elegantly guide two different types of visitors.
+
+a. Navbar
+Style: Sticky, semi-transparent with a blur effect, becoming opaque on scroll.
+
+Content: Logo (left); Links: About, For Individuals, For Businesses, Blog, Contact; CTA Button (right): "Book a Strategy Call".
+
+b. Hero Section
+Layout: Full-screen and impactful. It must speak to both audiences.
+
+Content:
+
+Main Headline: A headline that captures the dual focus: Catalyzing Careers. Empowering Businesses.
+
+Sub-headline: "Expert career guidance for individuals seeking purpose and strategic HR solutions for SMEs driving for growth."
+
+CTA Buttons (User Journey Split): Create two distinct, primary buttons to immediately segment the audience:
+
+"Advance My Career" (Links to the For Individuals section).
+
+"Grow My Business" (Links to the For Businesses section).
+
+c. Dual Services Sections
+Create two separate, full-width sections to detail the two core offerings.
+
+Section 1: For Individuals
+
+Headline: Unlock Your Dream Career: Where Passion Meets Purpose!
+
+Layout: A grid of premium service cards.
+
+Content (from the first post):
+
+Career Roadmapping: For Professionals, Students (8-12), and Graduates.
+
+Interest & Ability Audits: Pinpoint careers that match your unique strengths and joy.
+
+Values Alignment: Find work that feels right and aligns with your core values.
+
+Profile Building: Create standout profiles for college and early career success.
+
+Section 2: For Businesses
+
+Headline: SME HR Revolution: Turn HR Chaos into a Competitive Edge.
+
+Layout: A similar grid of premium service cards, but with a more corporate feel.
+
+Content (from the second post):
+
+Talent Acquisition: Headhunting top-tier talent for mission-critical roles.
+
+Performance Management: Build systems for accountability and results.
+
+Learning & Development: Upskill your team with training modules that transform performance.
+
+Strategic HR Operations: Onboarding, exit strategies, compliance, and HR dashboards.
+
+d. About Me Section
+Headline: Meet Elroy Vaz
+
+Sub-headline: Your Career Catalyst and HR Strategist
+
+Bio: CRITICAL: The two detailed posts are the source material for the bio. Synthesize the content from both posts into a coherent professional narrative.
+
+Start by introducing Elroy as a versatile expert with a passion for unlocking potential in both people and organizations.
+
+Dedicate the first paragraph to his work with individuals, using phrases like "reignite your passion," "ditch the confusion," and "roadmap tailored to YOUR unique interests."
+
+Dedicate the second paragraph to his expertise with SMEs, using phrases like "turn HR chaos into competitive edge," "business-boosting machine," and his skills in headhunting, performance management, and compliance.
+
+Conclude by tying the two fields together, emphasizing that his deep understanding of individual career drivers makes him uniquely effective at building high-performance teams for businesses.
+
+e. Packages & Payments Section
+Layout: Use two distinct sub-sections with pricing tables.
+
+Packages for Individuals (with Razorpay integration):
+
+Career Clarity Call: Single deep-dive session. Price: ₹4,999 (or equivalent).
+
+Student Success Package: Multi-session guidance for students. Price: ₹14,999.
+
+Solutions for Businesses (with "Request a Quote" buttons):
+
+HR Strategy Audit: A comprehensive review of your current HR ops.
+
+Recruitment Retainer: Ongoing support for talent acquisition.
+
+f. Blog, Testimonials, Contact, and Footer
+Testimonials & Blog: Use placeholders as requested.
+
+Contact Section: A form next to his details: elroyv@gmail.com, +971 50 240 4129, and social media icons.
+
+Footer: A comprehensive footer with links and social media handles.
+
+LinkedIn: https://www.linkedin.com/in/elroy-vaz-educator-learninganddevelopmentspecialist/
+
+Instagram: https://www.instagram.com/ecv167/
+
+5. Key Functionality & Integrations
+Razorpay Integration: The individual package buttons must trigger the Razorpay modal. Use the live credentials you provide via Replit Secrets.
+
+Contact Form: Implement validation and a "Thank you!" success message.
+
+Responsiveness: Flawless display on all devices is mandatory.
+
+SEO & Metadata:
+
+Title: Career Catalyst - Career Guidance & SME HR Solutions by Elroy Vaz
+
+Meta Description: Expert career coaching for students and professionals, and strategic HR consulting for SMEs. Unlock potential with Elroy Vaz, your Career Catalyst.
+
+Keywords: career guidance, SME HR consulting, Elroy Vaz, Career Catalyst, headhunting, performance management, career coach, Dubai, UAE.
