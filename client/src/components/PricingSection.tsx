@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import PricingCard from './PricingCard';
 import { useToast } from '@/hooks/use-toast';
 
@@ -9,6 +10,25 @@ declare global {
 
 export default function PricingSection() {
   const { toast } = useToast();
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleRazorpayPayment = (amount: number, packageName: string) => {
     //todo: remove mock functionality
@@ -121,36 +141,62 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-20 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-16">
-          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-secondary text-center mb-4">
-            Packages for Individuals
-          </h2>
-          <p className="font-sans text-lg text-center text-muted-foreground max-w-2xl mx-auto">
-            Invest in your future with our tailored career guidance packages
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-8 mb-20">
-          {individualPackages.map((pkg, index) => (
-            <PricingCard key={index} {...pkg} />
-          ))}
+    <section id="pricing" ref={sectionRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-br from-muted/20 via-background to-muted/30 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-20 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Individual Packages */}
+        <div className={`mb-16 sm:mb-20 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-4">
+              <span className="text-sm font-semibold text-primary">Pricing</span>
+            </div>
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-secondary mb-4">
+              Packages for Individuals
+            </h2>
+            <p className="font-sans text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Invest in your future with our tailored career guidance packages
+            </p>
+          </div>
+          
+          <div className="grid sm:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
+            {individualPackages.map((pkg, index) => (
+              <div 
+                key={index}
+                className={`${isVisible ? 'animate-fade-in-up' : 'opacity-0'} stagger-${index + 1}`}
+              >
+                <PricingCard {...pkg} />
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="mb-16">
-          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-secondary text-center mb-4">
-            Solutions for Businesses
-          </h2>
-          <p className="font-sans text-lg text-center text-muted-foreground max-w-2xl mx-auto">
-            Customized HR solutions designed for your SME's unique needs
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          {businessSolutions.map((solution, index) => (
-            <PricingCard key={index} {...solution} />
-          ))}
+        {/* Business Solutions */}
+        <div className={`${isVisible ? 'animate-fade-in-up' : 'opacity-0'} stagger-3`}>
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-block px-4 py-2 bg-secondary/10 rounded-full mb-4">
+              <span className="text-sm font-semibold text-secondary">Enterprise</span>
+            </div>
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-secondary mb-4">
+              Solutions for Businesses
+            </h2>
+            <p className="font-sans text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Customized HR solutions designed for your SME's unique needs
+            </p>
+          </div>
+          
+          <div className="grid sm:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
+            {businessSolutions.map((solution, index) => (
+              <div 
+                key={index}
+                className={`${isVisible ? 'animate-fade-in-up' : 'opacity-0'} stagger-${index + 4}`}
+              >
+                <PricingCard {...solution} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
