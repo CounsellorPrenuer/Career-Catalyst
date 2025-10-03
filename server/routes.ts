@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactInquirySchema } from "@shared/schema";
+import { insertContactInquirySchema, insertPaymentSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Contact form submission endpoint
@@ -52,13 +52,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create payment
   app.post("/api/payments", async (req, res) => {
     try {
-      const payment = await storage.createPayment(req.body);
+      const validatedData = insertPaymentSchema.parse(req.body);
+      const payment = await storage.createPayment(validatedData);
       res.json({ success: true, payment });
     } catch (error) {
       console.error("Error creating payment:", error);
       res.status(400).json({ 
         success: false, 
-        error: "Failed to create payment" 
+        error: error instanceof Error ? error.message : "Failed to create payment" 
       });
     }
   });

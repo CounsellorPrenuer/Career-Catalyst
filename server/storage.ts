@@ -76,7 +76,7 @@ export class DbStorage implements IStorage {
       contacted: contactedLeads.length,
       completed: completedLeads.length,
       contactForms: allContacts.length,
-      totalPayments: completedPayments.length,
+      totalPayments: allPayments.length,
       revenue: revenue,
     };
   }
