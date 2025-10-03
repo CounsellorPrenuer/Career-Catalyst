@@ -6,6 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Set environment variables for Vite to access
+if (process.env.RAZORPAY_KEY_ID) {
+  process.env.VITE_RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
+}
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

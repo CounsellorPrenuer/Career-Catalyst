@@ -169,8 +169,19 @@ export default function PricingSection() {
   const handlePurchase = (planName: string, price: string) => {
     const numericPrice = parseInt(price.replace(/[₹,]/g, ''));
     
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+    
+    if (!razorpayKey) {
+      toast({
+        title: 'Configuration Error',
+        description: 'Payment gateway is not configured. Please contact support.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     const options = {
-      key: 'rzp_test_placeholder',
+      key: razorpayKey,
       amount: numericPrice * 100,
       currency: 'INR',
       name: 'Career Catalyst',
@@ -178,7 +189,7 @@ export default function PricingSection() {
       handler: function (response: any) {
         toast({
           title: 'Payment Successful!',
-          description: `Thank you for purchasing ${planName}. We'll contact you shortly.`,
+          description: `Thank you for purchasing ${planName}. We'll contact you shortly at elroyv@gmail.com.`,
         });
         console.log('Payment successful:', response);
       },
@@ -188,19 +199,33 @@ export default function PricingSection() {
         contact: '',
       },
       theme: {
-        color: '#4DB6AC',
+        color: '#2D9D8E',
       },
+      modal: {
+        ondismiss: function() {
+          console.log('Payment modal closed');
+        }
+      }
     };
 
     if (typeof window !== 'undefined' && window.Razorpay) {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } else {
-      toast({
-        title: 'Payment Gateway Loading',
-        description: 'Please wait while we initialize the payment gateway...',
-        variant: 'destructive',
-      });
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      };
+      script.onerror = () => {
+        toast({
+          title: 'Payment Gateway Error',
+          description: 'Failed to load payment gateway. Please check your connection and try again.',
+          variant: 'destructive',
+        });
+      };
+      document.body.appendChild(script);
     }
   };
 
