@@ -26,6 +26,7 @@ export default function Navbar() {
     { label: 'About', id: 'about' },
     { label: 'For Individuals', id: 'individuals' },
     { label: 'For Businesses', id: 'businesses' },
+    { label: 'Pricing', id: 'pricing' },
     { label: 'Blog', id: 'blog' },
     { label: 'Contact', id: 'contact' },
   ];
