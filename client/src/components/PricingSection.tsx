@@ -3,6 +3,15 @@ import { Check, X, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 declare global {
   interface Window {
@@ -147,6 +156,10 @@ export default function PricingSection() {
   const { toast } = useToast();
   const [isVisible, setIsVisible] = useState(false);
   const [activeCategory, setActiveCategory] = useState<Category>('8-9 STUDENTS');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{ planName: string; price: string } | null>(null);
+  const [userDetails, setUserDetails] = useState({ name: '', email: '', phone: '' });
+  const [isProcessing, setIsProcessing] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -166,7 +179,26 @@ export default function PricingSection() {
     return () => observer.disconnect();
   }, []);
 
-  const handlePurchase = async (planName: string, price: string) => {
+  const handleBuyNowClick = (planName: string, price: string) => {
+    setSelectedPlan({ planName, price });
+    setUserDetails({ name: '', email: '', phone: '' });
+    setDialogOpen(true);
+  };
+
+  const handleProceedToPayment = async () => {
+    if (!userDetails.name || !userDetails.email || !userDetails.phone) {
+      toast({
+        title: 'Missing Information',
+        description: 'Please fill in all your details to proceed.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!selectedPlan) return;
+
+    setIsProcessing(true);
+    const { planName, price } = selectedPlan;
     const numericPrice = parseInt(price.replace(/[₹,]/g, ''));
     
     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
@@ -177,6 +209,7 @@ export default function PricingSection() {
         description: 'Payment gateway is not configured. Please contact support.',
         variant: 'destructive',
       });
+      setIsProcessing(false);
       return;
     }
 
@@ -188,11 +221,17 @@ export default function PricingSection() {
           planName,
           category: activeCategory,
           amount: numericPrice,
+          name: userDetails.name,
+          email: userDetails.email,
+          phone: userDetails.phone,
           status: 'initiated'
         }),
       });
 
       const { payment } = await paymentResponse.json();
+      
+      setDialogOpen(false);
+      setIsProcessing(false);
     
       const options = {
         key: razorpayKey,
@@ -207,22 +246,19 @@ export default function PricingSection() {
             body: JSON.stringify({
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id,
-              status: 'completed',
-              name: response.name || '',
-              email: response.email || '',
-              phone: response.contact || ''
+              status: 'completed'
             }),
           });
 
           toast({
             title: 'Payment Successful!',
-            description: `Thank you for purchasing ${planName}. We'll contact you shortly at elroyv@gmail.com.`,
+            description: `Thank you for purchasing ${planName}. We'll contact you shortly at ${userDetails.email}.`,
           });
         },
         prefill: {
-          name: '',
-          email: '',
-          contact: '',
+          name: userDetails.name,
+          email: userDetails.email,
+          contact: userDetails.phone,
         },
         theme: {
           color: '#2D9D8E',
@@ -258,6 +294,7 @@ export default function PricingSection() {
         document.body.appendChild(script);
       }
     } catch (error) {
+      setIsProcessing(false);
       toast({
         title: 'Error',
         description: 'Failed to initiate payment. Please try again.',
@@ -351,7 +388,7 @@ export default function PricingSection() {
               </ul>
               
               <Button
-                onClick={() => handlePurchase(currentPackages.standard.planName, currentPackages.standard.price)}
+                onClick={() => handleBuyNowClick(currentPackages.standard.planName, currentPackages.standard.price)}
                 className="w-full bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                 size="lg"
                 data-testid={`button-buy-${currentPackages.standard.planName.toLowerCase().replace(/\s+/g, '-')}`}
@@ -411,7 +448,7 @@ export default function PricingSection() {
               </ul>
               
               <Button
-                onClick={() => handlePurchase(currentPackages.premium.planName, currentPackages.premium.price)}
+                onClick={() => handleBuyNowClick(currentPackages.premium.planName, currentPackages.premium.price)}
                 className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                 size="lg"
                 data-testid={`button-buy-${currentPackages.premium.planName.toLowerCase().replace(/\s+/g, '-')}`}
@@ -422,6 +459,98 @@ export default function PricingSection() {
           </Card>
         </div>
       </div>
+
+      {/* User Details Modal */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-heading font-bold gradient-text">
+              Complete Your Purchase
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Please provide your contact details so we can reach you about{' '}
+              <span className="font-semibold text-foreground">{selectedPlan?.planName}</span>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-semibold">
+                Full Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="name"
+                placeholder="Enter your full name"
+                value={userDetails.name}
+                onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
+                className="w-full"
+                data-testid="input-name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-semibold">
+                Email Address <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={userDetails.email}
+                onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
+                className="w-full"
+                data-testid="input-email"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-semibold">
+                Phone Number <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+971 50 123 4567"
+                value={userDetails.phone}
+                onChange={(e) => setUserDetails({ ...userDetails, phone: e.target.value })}
+                className="w-full"
+                data-testid="input-phone"
+              />
+            </div>
+
+            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Plan:</span>
+                <span className="font-semibold">{selectedPlan?.planName}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Amount:</span>
+                <span className="text-xl font-bold gradient-text">{selectedPlan?.price}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+              className="flex-1"
+              disabled={isProcessing}
+              data-testid="button-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleProceedToPayment}
+              className="flex-1 bg-gradient-to-r from-primary to-primary/90"
+              disabled={isProcessing}
+              data-testid="button-proceed"
+            >
+              {isProcessing ? 'Processing...' : 'Proceed to Payment'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

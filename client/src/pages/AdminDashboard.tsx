@@ -540,14 +540,14 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {payments.filter(p => p.status === 'completed').length === 0 ? (
+                    {payments.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                          No completed payments found
+                          No payments found
                         </TableCell>
                       </TableRow>
                     ) : (
-                      payments.filter(p => p.status === 'completed').map((payment) => (
+                      payments.map((payment) => (
                         <TableRow key={payment.id}>
                           <TableCell className="font-semibold">{payment.planName}</TableCell>
                           <TableCell>{payment.category}</TableCell>
@@ -556,6 +556,7 @@ export default function AdminDashboard() {
                             <div className="text-sm">
                               {payment.name && <div>{payment.name}</div>}
                               {payment.email && <div className="text-muted-foreground">{payment.email}</div>}
+                              {payment.phone && <div className="text-muted-foreground">{payment.phone}</div>}
                             </div>
                           </TableCell>
                           <TableCell className="text-xs">{payment.razorpayPaymentId || '-'}</TableCell>
