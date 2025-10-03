@@ -1,38 +1,20 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { type ContactInquiry, type InsertContactInquiry, contactInquiries } from "@shared/schema";
+import { db } from "../db/index";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createContactInquiry(inquiry: InsertContactInquiry): Promise<ContactInquiry>;
+  getAllContactInquiries(): Promise<ContactInquiry[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DbStorage implements IStorage {
+  async createContactInquiry(inquiry: InsertContactInquiry): Promise<ContactInquiry> {
+    const [created] = await db.insert(contactInquiries).values(inquiry).returning();
+    return created;
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async getAllContactInquiries(): Promise<ContactInquiry[]> {
+    return await db.select().from(contactInquiries).orderBy(contactInquiries.createdAt);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DbStorage();
