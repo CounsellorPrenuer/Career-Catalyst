@@ -19,8 +19,8 @@ export default function Home() {
       <BusinessServices />
       <PricingSection />
       <BlogSection />
-      <ContactSection />
       <TestimonialSection />
+      <ContactSection />
       <Footer />
     </div>
   );
