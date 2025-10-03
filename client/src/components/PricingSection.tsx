@@ -166,7 +166,7 @@ export default function PricingSection() {
     return () => observer.disconnect();
   }, []);
 
-  const handlePurchase = (planName: string, price: string) => {
+  const handlePurchase = async (planName: string, price: string) => {
     const numericPrice = parseInt(price.replace(/[₹,]/g, ''));
     
     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
@@ -179,53 +179,90 @@ export default function PricingSection() {
       });
       return;
     }
-    
-    const options = {
-      key: razorpayKey,
-      amount: numericPrice * 100,
-      currency: 'INR',
-      name: 'Career Catalyst',
-      description: planName,
-      handler: function (response: any) {
-        toast({
-          title: 'Payment Successful!',
-          description: `Thank you for purchasing ${planName}. We'll contact you shortly at elroyv@gmail.com.`,
-        });
-        console.log('Payment successful:', response);
-      },
-      prefill: {
-        name: '',
-        email: '',
-        contact: '',
-      },
-      theme: {
-        color: '#2D9D8E',
-      },
-      modal: {
-        ondismiss: function() {
-          console.log('Payment modal closed');
-        }
-      }
-    };
 
-    if (typeof window !== 'undefined' && window.Razorpay) {
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } else {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => {
+    try {
+      const paymentResponse = await fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planName,
+          category: activeCategory,
+          amount: numericPrice,
+          status: 'initiated'
+        }),
+      });
+
+      const { payment } = await paymentResponse.json();
+    
+      const options = {
+        key: razorpayKey,
+        amount: numericPrice * 100,
+        currency: 'INR',
+        name: 'Career Catalyst',
+        description: planName,
+        handler: async function (response: any) {
+          await fetch(`/api/payments/${payment.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              status: 'completed',
+              name: response.name || '',
+              email: response.email || '',
+              phone: response.contact || ''
+            }),
+          });
+
+          toast({
+            title: 'Payment Successful!',
+            description: `Thank you for purchasing ${planName}. We'll contact you shortly at elroyv@gmail.com.`,
+          });
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: '',
+        },
+        theme: {
+          color: '#2D9D8E',
+        },
+        modal: {
+          ondismiss: async function() {
+            await fetch(`/api/payments/${payment.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'cancelled' }),
+            });
+          }
+        }
+      };
+
+      if (typeof window !== 'undefined' && window.Razorpay) {
         const rzp = new window.Razorpay(options);
         rzp.open();
-      };
-      script.onerror = () => {
-        toast({
-          title: 'Payment Gateway Error',
-          description: 'Failed to load payment gateway. Please check your connection and try again.',
-          variant: 'destructive',
-        });
-      };
-      document.body.appendChild(script);
+      } else {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => {
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        };
+        script.onerror = () => {
+          toast({
+            title: 'Payment Gateway Error',
+            description: 'Failed to load payment gateway. Please check your connection and try again.',
+            variant: 'destructive',
+          });
+        };
+        document.body.appendChild(script);
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to initiate payment. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 
