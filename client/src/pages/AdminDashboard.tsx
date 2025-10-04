@@ -376,19 +376,25 @@ export default function AdminDashboard() {
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  {payments.filter(p => p.status === 'completed').slice(0, 5).length === 0 ? (
+                  {payments.slice(0, 5).length === 0 ? (
                     <p className="text-muted-foreground text-center py-8">No payments yet</p>
                   ) : (
                     <div className="space-y-3">
-                      {payments.filter(p => p.status === 'completed').slice(0, 5).map((payment) => (
-                        <div key={payment.id} className="flex justify-between items-center border-b pb-3">
+                      {payments.slice(0, 5).map((payment) => (
+                        <div key={payment.id} className="flex justify-between items-start border-b pb-3">
                           <div>
                             <p className="font-semibold text-sm">{payment.planName}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {payment.name || payment.email || 'No contact info'}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               {new Date(payment.createdAt).toLocaleDateString()}
                             </p>
                           </div>
-                          <p className="font-semibold text-green-600">₹{payment.amount}</p>
+                          <div className="text-right">
+                            <p className="font-semibold text-green-600">₹{payment.amount}</p>
+                            {getStatusBadge(payment.status)}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -398,17 +404,34 @@ export default function AdminDashboard() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Recent Lead Downloads</CardTitle>
-                  <Button variant="ghost" size="sm">
+                  <CardTitle>All Leads</CardTitle>
+                  <Button variant="ghost" size="sm" onClick={handleExportAll}>
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <ArrowDownToLine className="w-12 h-12 text-muted-foreground mb-3" />
-                    <p className="text-muted-foreground text-sm">No downloads yet</p>
-                  </div>
+                  {contacts.length === 0 && payments.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <ArrowDownToLine className="w-12 h-12 text-muted-foreground mb-3" />
+                      <p className="text-muted-foreground text-sm">No leads yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center text-sm">
+                        <p className="text-muted-foreground">Total Leads</p>
+                        <p className="font-bold text-primary">{contacts.length + payments.length}</p>
+                      </div>
+                      <div className="flex justify-between items-center text-sm border-t pt-2">
+                        <p className="text-muted-foreground">Contact Forms</p>
+                        <p className="font-semibold">{contacts.length}</p>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <p className="text-muted-foreground">Payment Inquiries</p>
+                        <p className="font-semibold">{payments.length}</p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -574,14 +597,65 @@ export default function AdminDashboard() {
           {/* Lead Downloads Tab */}
           <TabsContent value="downloads">
             <Card>
-              <CardHeader>
-                <CardTitle>Lead Downloads</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>All Leads</CardTitle>
+                <Button onClick={handleExportAll}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export All Data
+                </Button>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col items-center justify-center py-20">
-                  <ArrowDownToLine className="w-16 h-16 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground text-lg">No downloads yet</p>
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Details</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {contacts.length === 0 && payments.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                          No leads found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {contacts.map((contact) => (
+                          <TableRow key={`contact-${contact.id}`}>
+                            <TableCell className="font-semibold">{contact.name}</TableCell>
+                            <TableCell className="text-muted-foreground">{contact.email}</TableCell>
+                            <TableCell className="text-muted-foreground">{contact.phone}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">Contact Form</Badge>
+                            </TableCell>
+                            <TableCell className="text-sm">{contact.service}</TableCell>
+                            <TableCell>{getStatusBadge(contact.status)}</TableCell>
+                            <TableCell>{new Date(contact.createdAt).toLocaleDateString()}</TableCell>
+                          </TableRow>
+                        ))}
+                        {payments.map((payment) => (
+                          <TableRow key={`payment-${payment.id}`}>
+                            <TableCell className="font-semibold">{payment.name || '-'}</TableCell>
+                            <TableCell className="text-muted-foreground">{payment.email || '-'}</TableCell>
+                            <TableCell className="text-muted-foreground">{payment.phone || '-'}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">Payment</Badge>
+                            </TableCell>
+                            <TableCell className="text-sm">{payment.planName} - {payment.category}</TableCell>
+                            <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                            <TableCell>{new Date(payment.createdAt).toLocaleDateString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </>
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
