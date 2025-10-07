@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import profileImage from '@assets/profile_1759315925367.png';
+import profileImage from '@assets/photo_1759817713525.jpeg';
 import { Award, Users, Briefcase, Target } from 'lucide-react';
 
 export default function AboutSection() {
