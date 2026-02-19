@@ -113,12 +113,12 @@ export default function PricingSection() {
         setPricingData(grouped);
         setCustomPlans(custom);
         setLoading(false);
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error("Failed to fetch pricing for project 'ua6tzmti':", error);
         toast({
           title: "Error",
-          description: "Failed to load pricing plans.",
-          variant: 'destructive'
+          description: "Failed to load pricing plans. Please check your Sanity CORS settings.",
+          variant: "destructive"
         });
         setLoading(false);
       }

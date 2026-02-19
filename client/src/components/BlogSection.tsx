@@ -49,11 +49,11 @@ export default function BlogSection() {
         setLoading(false);
       })
       .catch(err => {
-        console.error("Failed to fetch blog posts:", err);
+        console.error("Failed to fetch blog posts for project 'ua6tzmti':", err);
         setLoading(false);
         toast({
           title: "Error",
-          description: "Failed to load blog posts.",
+          description: "Failed to load blog posts. Check your Sanity CORS settings.",
           variant: "destructive"
         });
       });
