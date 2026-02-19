@@ -50,15 +50,34 @@ export default function ContactForm() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
 
-    // Mock network request
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Build mailto link with all form data
+      const subject = encodeURIComponent(`New Inquiry: ${data.service} — from ${data.name}`);
+      const body = encodeURIComponent(
+        `Name: ${data.name}\n` +
+        `Email: ${data.email}\n` +
+        `Phone: ${data.phone}\n` +
+        `Service Interest: ${data.service}\n\n` +
+        `Message:\n${data.message}\n`
+      );
+
+      // Open email client
+      window.location.href = `mailto:elroyv@gmail.com?subject=${subject}&body=${body}`;
+
       toast({
-        title: 'Message Sent Successfully! (Mock)',
-        description: 'Thank you for reaching out. We\'ll get back to you within 24 hours.',
+        title: 'Redirecting to your email client...',
+        description: 'Please send the pre-filled email to complete your inquiry.',
       });
       form.reset();
-    }, 1000);
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Something went wrong. Please email us directly at elroyv@gmail.com',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
