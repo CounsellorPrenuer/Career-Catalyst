@@ -27,8 +27,9 @@ export default defineConfig({
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
+  base: './', // Ensure relative paths for static hosting
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(import.meta.dirname, "dist"), // Build to 'dist' in root
     emptyOutDir: true,
   },
   server: {

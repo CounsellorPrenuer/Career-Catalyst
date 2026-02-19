@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -65,33 +65,59 @@ interface Payment {
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
 
-  const { data: statsData } = useQuery<{ success: boolean; stats: Stats }>({
-    queryKey: ['/api/admin/stats'],
-  });
-
-  const { data: contactsData } = useQuery<{ success: boolean; inquiries: ContactInquiry[] }>({
-    queryKey: ['/api/contact'],
-  });
-
-  const { data: paymentsData } = useQuery<{ success: boolean; payments: Payment[] }>({
-    queryKey: ['/api/payments'],
-  });
-
-  const stats: Stats = statsData?.stats || {
-    totalBookings: 0,
-    pending: 0,
-    contacted: 0,
-    completed: 0,
-    contactForms: 0,
-    totalPayments: 0,
-    revenue: 0,
+  // Mock Data
+  const stats: Stats = {
+    totalBookings: 12,
+    pending: 3,
+    contacted: 5,
+    completed: 4,
+    contactForms: 8,
+    totalPayments: 12,
+    revenue: 125000,
   };
 
-  const contacts: ContactInquiry[] = contactsData?.inquiries || [];
-  const payments: Payment[] = paymentsData?.payments || [];
+  const contacts: ContactInquiry[] = [
+    {
+      id: '1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      phone: '+971 50 123 4567',
+      service: 'career-roadmapping',
+      message: 'Interested in career counseling.',
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      phone: '+971 50 987 6543',
+      service: 'interest-audits',
+      message: 'Looking for assessment details.',
+      status: 'contacted',
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+    }
+  ];
+
+  const payments: Payment[] = [
+    {
+      id: '1',
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      phone: '+971 55 111 2222',
+      planName: 'Discover',
+      category: '8-9 STUDENTS',
+      amount: 5500,
+      razorpayPaymentId: 'pay_123456',
+      razorpayOrderId: 'order_123456',
+      status: 'completed',
+      createdAt: new Date().toISOString(),
+    }
+  ];
 
   const handleExportAll = () => {
-    window.location.href = '/api/admin/export/all';
+    // window.location.href = '/api/admin/export/all';
+    alert("Export functionality is disabled in the static demo.");
   };
 
   const exportToCSV = (data: any[], filename: string, headers: string[]) => {

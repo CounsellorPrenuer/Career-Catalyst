@@ -1,0 +1,13 @@
+name = "mentoria-payments"
+main = "src/index.ts"
+compatibility_date = "2023-12-01"
+
+[vars]
+RAZORPAY_KEY_ID = "rzp_live_ZDRBsLXKmZI6Gu"
+# Ideally secret, but user asked to store keys in worker and be done.
+RAZORPAY_KEY_SECRET = "ICeztAUq6hLeCxBgNzIU1awy"
+RAZORPAY_WEBHOOK_SECRET = "MLGT3me@a2v9_@e"
+
+# Allow CORS
+[triggers]
+crons = []
