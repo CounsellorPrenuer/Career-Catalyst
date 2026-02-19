@@ -102,7 +102,7 @@ app.post('/payment-callback', async (c) => {
         const razorpay_signature = formData['razorpay_signature'] as string
 
         const secret = c.env.RAZORPAY_KEY_SECRET
-        const siteUrl = 'https://counsellorprenuer.github.io/elroy'
+        const siteUrl = 'https://counsellorprenuer.github.io/Career-Catalyst'
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return c.redirect(`${siteUrl}/#/pricing?payment=failed&reason=missing_params`)
@@ -127,7 +127,7 @@ app.post('/payment-callback', async (c) => {
             return c.redirect(`${siteUrl}/#/pricing?payment=failed&reason=signature_mismatch`)
         }
     } catch (err: any) {
-        const siteUrl = 'https://counsellorprenuer.github.io/elroy'
+        const siteUrl = 'https://counsellorprenuer.github.io/Career-Catalyst'
         return c.redirect(`${siteUrl}/#/pricing?payment=failed&reason=server_error`)
     }
 })
