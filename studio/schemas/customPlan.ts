@@ -23,5 +23,13 @@ export default {
             title: 'Description',
             type: 'text',
         },
+        {
+            name: 'image',
+            title: 'Plan Image',
+            type: 'image',
+            options: {
+                hotspot: true,
+            },
+        },
     ],
 }

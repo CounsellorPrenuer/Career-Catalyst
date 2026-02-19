@@ -15,6 +15,12 @@ import { Label } from '@/components/ui/label';
 import { client } from '../sanity/client';
 import { pricingQuery, customPlansQuery } from '../sanity/queries';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import imageUrlBuilder from '@sanity/image-url';
+
+const builder = imageUrlBuilder(client);
+function urlFor(source: any) {
+  return builder.image(source);
+}
 
 // Razorpay Type Definition
 declare global {
@@ -47,6 +53,7 @@ interface CustomPlan {
   title: string;
   price: string;
   description: string;
+  image?: any;
 }
 
 interface Coupon {
@@ -398,7 +405,16 @@ Please verify my payment and start the service.
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
                 {customPlans.map((plan) => (
-                  <Card key={plan.planId} className="h-full flex flex-col hover:shadow-lg transition-shadow bg-white/60">
+                  <Card key={plan.planId} className="h-full flex flex-col hover:shadow-lg transition-shadow bg-white/60 overflow-hidden">
+                    {plan.image && (
+                      <div className="h-48 overflow-hidden">
+                        <img
+                          src={urlFor(plan.image).url()}
+                          alt={plan.title}
+                          className="w-full h-full object-cover transition-transform hover:scale-105"
+                        />
+                      </div>
+                    )}
                     <CardHeader>
                       <div className="flex justify-between items-start gap-2">
                         <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-secondary to-accent font-bold text-lg">
