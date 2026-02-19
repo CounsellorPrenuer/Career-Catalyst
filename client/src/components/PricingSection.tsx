@@ -56,7 +56,7 @@ interface Coupon {
   isActive: boolean;
 }
 
-const WORKER_URL = 'http://localhost:8787'; // Should be env var in production
+const WORKER_URL = 'https://mentoria-payments.garyphadale.workers.dev';
 
 export default function PricingSection() {
   const { toast } = useToast();
