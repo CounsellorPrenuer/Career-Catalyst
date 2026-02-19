@@ -93,4 +93,43 @@ app.post('/verify-payment', async (c) => {
     }
 })
 
+// POST callback for Razorpay full-page redirect checkout
+app.post('/payment-callback', async (c) => {
+    try {
+        const formData = await c.req.parseBody()
+        const razorpay_order_id = formData['razorpay_order_id'] as string
+        const razorpay_payment_id = formData['razorpay_payment_id'] as string
+        const razorpay_signature = formData['razorpay_signature'] as string
+
+        const secret = c.env.RAZORPAY_KEY_SECRET
+        const siteUrl = 'https://counsellorprenuer.github.io/elroy'
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            return c.redirect(`${siteUrl}/#/pricing?payment=failed&reason=missing_params`)
+        }
+
+        // Verify signature
+        const text = razorpay_order_id + "|" + razorpay_payment_id
+        const encoder = new TextEncoder()
+        const keyData = encoder.encode(secret)
+        const msgData = encoder.encode(text)
+
+        const cryptoKey = await crypto.subtle.importKey(
+            'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+        )
+        const signature = await crypto.subtle.sign('HMAC', cryptoKey, msgData)
+        const hashArray = Array.from(new Uint8Array(signature))
+        const generated_signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+
+        if (generated_signature === razorpay_signature) {
+            return c.redirect(`${siteUrl}/#/pricing?payment=success&payment_id=${razorpay_payment_id}&order_id=${razorpay_order_id}`)
+        } else {
+            return c.redirect(`${siteUrl}/#/pricing?payment=failed&reason=signature_mismatch`)
+        }
+    } catch (err: any) {
+        const siteUrl = 'https://counsellorprenuer.github.io/elroy'
+        return c.redirect(`${siteUrl}/#/pricing?payment=failed&reason=server_error`)
+    }
+})
+
 export default app

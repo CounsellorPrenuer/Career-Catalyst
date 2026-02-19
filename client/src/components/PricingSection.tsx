@@ -200,7 +200,6 @@ export default function PricingSection() {
 
     try {
       // 1. Create Order via Worker
-      // Note: For localhost testing, ensure worker is running on 8787 or deployed URL
       const orderRes = await fetch(`${WORKER_URL}/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -210,7 +209,11 @@ export default function PricingSection() {
           receipt: `rcpt_${Date.now()}`,
           notes: {
             plan: selectedPlan.planName,
-            coupon: appliedCoupon?.code || ''
+            coupon: appliedCoupon?.code || '',
+            customerName: userDetails.name,
+            customerEmail: userDetails.email,
+            customerPhone: userDetails.phone,
+            category: selectedPlan.isCustom ? 'Custom Plan' : selectedPlan.category,
           }
         })
       });
@@ -221,7 +224,7 @@ export default function PricingSection() {
         throw new Error(orderData.error || 'Order creation failed');
       }
 
-      // 2. Open Razorpay
+      // 2. Open Razorpay Full-Page Checkout (redirect mode)
       const options = {
         key: orderData.key_id,
         amount: orderData.amount,
@@ -229,44 +232,8 @@ export default function PricingSection() {
         name: "Mentoria",
         description: `Payment for ${selectedPlan.planName}`,
         order_id: orderData.id,
-        handler: async function (response: any) {
-          // 3. Verify Payment
-          const verifyRes = await fetch(`${WORKER_URL}/verify-payment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature
-            })
-          });
-
-          const verifyData = await verifyRes.json();
-
-          if (verifyData.valid) {
-            // 4. Save to DB
-            await fetch('/api/payments', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                name: userDetails.name,
-                email: userDetails.email,
-                phone: userDetails.phone,
-                planName: selectedPlan.planName,
-                category: selectedPlan.isCustom ? 'Custom Plan' : selectedPlan.category,
-                amount: finalPrice,
-                status: 'completed',
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpayOrderId: response.razorpay_order_id
-              })
-            });
-
-            // 5. Redirect to Mailto
-            triggerMailto(response.razorpay_payment_id);
-          } else {
-            toast({ title: "Payment Verification Failed", variant: "destructive" });
-          }
-        },
+        callback_url: `${WORKER_URL}/payment-callback`,
+        redirect: true,
         prefill: {
           name: userDetails.name,
           email: userDetails.email,
@@ -274,13 +241,15 @@ export default function PricingSection() {
         },
         theme: {
           color: "#7E22CE"
+        },
+        notes: {
+          plan: selectedPlan.planName,
+          customerName: userDetails.name,
+          customerEmail: userDetails.email,
         }
       };
 
       const rzp1 = new window.Razorpay(options);
-      rzp1.on('payment.failed', function (response: any) {
-        toast({ title: "Payment Failed", description: response.error.description, variant: "destructive" });
-      });
       rzp1.open();
 
     } catch (e: any) {
